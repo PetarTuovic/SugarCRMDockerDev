@@ -1,36 +1,36 @@
 version: "3.8"
 services:
-  web-server-php-74:
-    container_name: php-74
+  web-server-php-82:
+    container_name: php-82
     build:
-      dockerfile: php.Dockerfile
+      dockerfile: php82.Dockerfile
       context: .
     restart: always
     user: "www-data:www-data"
     volumes:
-      - "./www/:/var/www/html/"
+      - "./www/82/:/var/www/html/"
       - "./conf/apache/sites-available/:/etc/apache2/sites-available/"
     ports:
-      - "87:80"
-  web-server-php-81:
-    container_name: php-81
+      - "82:80"
+  web-server-php-83:
+    container_name: php-83
     build:
-      dockerfile: php8.Dockerfile
+      dockerfile: php83.Dockerfile
       context: .
     restart: always
     user: "www-data:www-data"
     volumes:
-      - "./www/:/var/www/html/"
+      - "./www/83/:/var/www/html/"
       - "./conf/apache/sites-available/:/etc/apache2/sites-available/"
     ports:
       - "80:80"
 
-  mysql-server-57:
-    container_name: mysql-57
-    image: mysql:5.7.33
+  mysql-server:
+    container_name: mysql
+    image: mysql:8.0.28
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: YOUR_PASS
+      MYSQL_ROOT_PASSWORD: P1e2t3a4r5!
     volumes:
       - "./dumps/:/home/dumps/"
     ports:
@@ -40,64 +40,19 @@ services:
         target: /etc/mysql/conf.d/custom.cnf
       - source: mysql-cli
         target: /home/.config/mysql-cli.cnf
-      - source: importDb
-        target: /usr/bin/importDb
-      - source: exportDb
-        target: /usr/bin/exportDb
-
-  mysql-server-80:
-    container_name: mysql-80
-    image: mysql:8.0.28
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: YOUR_PASS
-    volumes:
-      - "./dumps/:/home/dumps/"
-    ports:
-      - "3307:3306"
-    secrets:
-      - source: custom8
-        target: /etc/mysql/conf.d/custom.cnf
-      - source: mysql-cli
-        target: /home/.config/mysql-cli.cnf
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
 
-  phpmyadmin-74:
-    container_name: phpmyadmin-74
-    image: phpmyadmin/phpmyadmin:5.0.2
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin:5.2.1
     restart: always
     environment:
-      PMA_HOST: mysql-57
+      PMA_HOST: mysql
       PMA_USER: root
-      PMA_PASSWORD: YOUR_PASS
-    ports:
-      - "5074:80"
-
-  phpmyadmin-81:
-    container_name: phpmyadmin-81
-    image: phpmyadmin/phpmyadmin:5.2.0
-    restart: always
-    environment:
-      PMA_HOST: mysql-80
-      PMA_USER: root
-      PMA_PASSWORD: YOUR_PASS
+      PMA_PASSWORD: P1e2t3a4r5!
     ports:
       - "5000:80"
-
-  elasticsearch-68:
-    image: elasticsearch:6.8.14
-    platform: linux
-    container_name: elasticsearch-68
-    environment:
-      - cluster.name=docker-cluster
-      - bootstrap.memory_lock=false
-      - "ES_JAVA_OPTS=-Xms1500m -Xmx1500m"
-      - discovery.type=single-node
-    mem_limit: 2g
-    restart: always
-    ports:
-      - "9268:9200"
 
   elasticsearch-716:
     image: elasticsearch:7.16.3
@@ -121,8 +76,6 @@ services:
 secrets:
     custom:
         file: ./conf/mysql/custom.cnf
-    custom8:
-        file: ./conf/mysql/custom_8.cnf
     mysql-cli:
         file: ./conf/mysql/mysql-cli.cnf
     importDb:
